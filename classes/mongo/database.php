@@ -6,7 +6,7 @@
  * <code>
  *  $db = Mongo_Database::instance();
  * </code>
- * 
+ *
  * The above will assume the 'default' configuration from the APPPATH/config/mongo.php file.
  * Alternatively it may be instantiated with the name and configuration specified as arguments:
  *
@@ -97,7 +97,7 @@ class Mongo_Database {
       if ($config === NULL)
       {
         // Load the configuration for this database
-        $config = Kohana::$config->load('mongo')->$name;
+        $config = Kohana::$config->load('database')->$name;
       }
 
       new self($name,$config);
@@ -161,15 +161,15 @@ class Mongo_Database {
                 : "mongodb://".ini_get('mongo.default_host').":".ini_get('mongo.default_port');
 
     $this->_connection = new Mongo($server, $options);
-    
+
     // Save the database name for later use
-    $this->_db = $config['database'];
+    $this->_db = $config['connection']['database'];
 
     // Set the collection class name
-    $this->_collection_class = (isset($config['collection']) ? $config['collection'] : 'Mongo_Collection');
-    
+    $this->_collection_class = (isset($config['connection']['collection']) ? $config['connection']['collection'] : 'Mongo_Collection');
+
     // Save profiling option in a public variable
-    $this->profiling = (isset($config['profiling']) && $config['profiling']);
+    $this->profiling = (isset($config['connection']['profiling']) && $config['connection']['profiling']);
 
     // Store the database instance
     self::$instances[$name] = $this;
@@ -197,7 +197,7 @@ class Mongo_Database {
   /**
    * Force the connection to be established.
    * This will automatically be called by any MongoDB methods that are proxied via __call
-   * 
+   *
    * @return boolean
    * @throws MongoException
    */
@@ -216,7 +216,7 @@ class Mongo_Database {
       {
         $this->profiler_stop($_bm);
       }
-      
+
       $this->_db = $this->_connection->selectDB("$this->_db");
     }
     return $this->_connected;
@@ -326,7 +326,7 @@ class Mongo_Database {
 
   /**
    * Get a Mongo_Collection instance (wraps MongoCollection)
-   * 
+   *
    * @param  string  $name
    * @return Mongo_Collection
    */
@@ -405,9 +405,9 @@ class Mongo_Database {
 
   /**
    * Set the profiler callback. Defaults to Kohana profiler.
-   * 
+   *
    * @param callback $start
-   * @param callback $stop 
+   * @param callback $stop
    */
   public function set_profiler($start, $stop)
   {
