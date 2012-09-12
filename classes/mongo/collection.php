@@ -113,7 +113,7 @@ class Mongo_Collection implements Iterator, Countable {
       $this->_model = $model;
     }
   }
-  
+
   /**
    * Cloned objects have uninitialized cursors.
    */
@@ -197,6 +197,28 @@ class Mongo_Collection implements Iterator, Countable {
     }
     return self::$collections[$name];
   }
+
+    /**
+     * Perform distinct query
+     *
+     * @param string $unique_field
+     * @param string $condition
+     * @return void
+     * @author Sean Sullivan
+     */
+    public function distinct($unique_field, $condition = array())
+    {
+        if($this->_cursor) throw new MongoCursorException('The cursor has already been instantiated.');
+
+        // Translate field aliases
+        $query_fields = array();
+
+        foreach($condition as $field => $value) {
+          $query_fields[$this->get_field_name($field)] = $value;
+        }
+
+        return $this->collection()->distinct($unique_field, $query_fields);
+    }
 
   /**
    * Set some criteria for the query. Unlike MongoCollection::find, this can be called multiple
@@ -516,17 +538,17 @@ class Mongo_Collection implements Iterator, Countable {
 
   /**
    * Is the query executed yet?
-   * 
+   *
    * @return bool
    */
   public function is_loaded()
   {
     return !!$this->_cursor;
   }
-  
+
   /**
    * Is the query iterating yet?
-   * 
+   *
    * @return bool
    */
   public function is_iterating()
@@ -619,7 +641,7 @@ class Mongo_Collection implements Iterator, Countable {
 
   /**
    * Simple findAndModify helper
-   * 
+   *
    * @param null|array $command
    * @return array
    */
@@ -674,7 +696,7 @@ class Mongo_Collection implements Iterator, Countable {
    *
    * @param array $criteria
    * @param array $update
-   * @param array $options 
+   * @param array $options
    * @return bool|int|MongoId
    * @throws MongoException on error
    */
