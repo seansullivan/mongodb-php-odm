@@ -1165,9 +1165,10 @@ abstract class Mongo_Document {
       throw new MongoException('Cannot delete '.get_class($this).' without the _id.');
     }
     $this->before_delete();
+
     $criteria = array('_id' => $this->_object['_id']);
 
-    if( ! $this->collection()->remove($criteria, TRUE))
+    if( ! $this->collection()->remove($criteria, array()))
     {
       throw new MongoException('Failed to delete '.get_class($this));
     }
