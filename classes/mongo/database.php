@@ -148,28 +148,33 @@ class Mongo_Database {
   {
     $this->_name = $name;
 
+    $config = $config['connection'];
+
     // Setup connection options merged over the defaults and store the connection
-    $options = array(
-      'connect' => FALSE  // Do not connect yet
+    $connection_options = array(
+        'connect' => false,  // Do not connect yet
+        'persist' => false,
+        'replicaSet' => false
     );
-    if(isset($config['options']))
-      $options = array_merge($options, $config['options']);
+
+    $config_connection_options = array_intersect_key($config, $connection_options);
+    $connection_options = array_merge($connection_options, $config_connection_options);
 
     // Use the default server string if no server option is given
     $server = isset($config['server'])
                 ? $config['server']
                 : "mongodb://".ini_get('mongo.default_host').":".ini_get('mongo.default_port');
 
-    $this->_connection = new Mongo($server, $options);
+    $this->_connection = new Mongo($server, $connection_options);
 
     // Save the database name for later use
-    $this->_db = $config['connection']['database'];
+    $this->_db = $config['database'];
 
     // Set the collection class name
-    $this->_collection_class = (isset($config['connection']['collection']) ? $config['connection']['collection'] : 'Mongo_Collection');
+    $this->_collection_class = (isset($config['collection']) ? $config['collection'] : 'Mongo_Collection');
 
     // Save profiling option in a public variable
-    $this->profiling = (isset($config['connection']['profiling']) && $config['connection']['profiling']);
+    $this->profiling = (isset($config['profiling']) && $config['profiling']);
 
     // Store the database instance
     self::$instances[$name] = $this;
