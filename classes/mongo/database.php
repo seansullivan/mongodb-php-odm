@@ -96,11 +96,21 @@ class Mongo_Database {
     {
       if ($config === NULL)
       {
-        // Load the configuration for this database
-        $config = Kohana::$config->load('database')->$name;
+          // Load the configuration for this database
+          if (Kohana::$environment === Kohana::DEVELOPMENT) {
+              $config = Kohana::$config->load('database/development')->$name;
+          }
+          else if (Kohana::$environment === Kohana::PRODUCTION) {
+              $config = Kohana::$config->load('database/production')->$name;
+          }
+
+          // look for standard db config if not found
+          if(!$config) {
+              $config = Kohana::$config->load('database')->$name;
+          }
       }
 
-      new self($name,$config);
+      new self($name, $config);
     }
 
     return self::$instances[$name];
@@ -152,7 +162,7 @@ class Mongo_Database {
 
     // Setup connection options merged over the defaults and store the connection
     $connection_options = array(
-        'connect' => false,  // Do not connect yet
+        'connect' => true,  // Do not connect yet
         'persist' => false,
         'replicaSet' => false
     );
