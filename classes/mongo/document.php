@@ -1014,7 +1014,7 @@ abstract class Mongo_Document {
         throw new MongoException('Cannot insert empty array.');
       }
 
-      $err = $this->collection()->insert($values, $safe);
+      $err = $this->collection()->insert($values);
 
       if( $safe && $err['err'] )
       {

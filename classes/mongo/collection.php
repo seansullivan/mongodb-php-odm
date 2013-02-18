@@ -190,11 +190,13 @@ class Mongo_Collection implements Iterator, Countable {
   public function collection()
   {
     $name = "$this->db.$this->name.$this->gridFS";
-    if( ! isset(self::$collections[$name]))
+
+    if(!isset(self::$collections[$name]))
     {
-      $selectMethod = ($this->gridFS ? 'getGridFS' : 'selectCollection');
-      self::$collections[$name] = $this->db()->db()->$selectMethod($this->name);
+		$selectMethod = ($this->gridFS ? 'getGridFS' : 'selectCollection');
+		self::$collections[$name] = $this->db()->db()->$selectMethod($this->name);
     }
+
     return self::$collections[$name];
   }
 

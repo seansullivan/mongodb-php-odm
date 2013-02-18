@@ -162,8 +162,6 @@ class Mongo_Database {
 
     // Setup connection options merged over the defaults and store the connection
     $connection_options = array(
-        'connect' => true,  // Do not connect yet
-        'persist' => false,
         'replicaSet' => false
     );
 
@@ -175,7 +173,12 @@ class Mongo_Database {
                 ? $config['server']
                 : "mongodb://".ini_get('mongo.default_host').":".ini_get('mongo.default_port');
 
-    $this->_connection = new Mongo($server, $connection_options);
+	try {
+    	$this->_connection = new MongoClient($server, $connection_options);
+	}
+	catch(MongoConnectionException $e) {
+		error_log($e->getMessage());
+	}
 
     // Save the database name for later use
     $this->_db = $config['database'];
